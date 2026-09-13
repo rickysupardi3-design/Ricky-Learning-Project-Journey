@@ -4,7 +4,6 @@ import { mockPosts } from "../data/posts";
 export default function PostDetail() {
   const { id } = useParams();
   const post = mockPosts.find((p) => p.id === parseInt(id));
-  post.image = "/screenshot1.png";
 
   if (!post) {
     
