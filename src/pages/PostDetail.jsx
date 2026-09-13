@@ -16,6 +16,8 @@ export default function PostDetail() {
       <Link to="/">← Back to Home</Link>
       <h1 style={{ marginTop: "1rem" }}>{post.title}</h1>
       <p style={{ color: "gray" }}><small>{post.date}</small></p>
+      <p style={{ lineHeight: "1.6", fontSize: "1.1rem" }}>{post.content}</p>
+      <p style={{ lineHeight: "1.6", fontSize: "1.1rem" }}>{post.content2}</p>
       {post.image && (
         <img 
           src={post.image} 
@@ -23,7 +25,10 @@ export default function PostDetail() {
           style={{ width: "100%", maxHeight: "400px", objectFit: "cover", borderRadius: "8px", margin: "1rem 0" }}
         />
       )}
-      <p style={{ lineHeight: "1.6", fontSize: "1.1rem" }}>{post.content}</p>
+      {post.imageParagraph && (
+        <p style={{ lineHeight: "1.6", fontSize: "1rem", fontStyle: "italic", color: "#555", marginBottom: "1.5rem" }}>{post.imageParagraph}</p>
+      )}
+      
     </div>
   );
 }
