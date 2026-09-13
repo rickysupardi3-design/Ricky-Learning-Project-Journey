@@ -5,14 +5,12 @@ export const mockPosts = [
     date: "September 13, 2026",
     excerpt: "Hello World! ",
     content: "Welcome to my first blog post. In this post, I will share my journey into the world of web development and how I started learning React. Stay tuned for more updates and insights!",
-    image: "/screenshot1.png"
   },
   {
     id: 2,
     title: "Python Panda Library",
     date: "September 13, 2026",
     excerpt: "Day 1 Goal : Extract data from excel files using Python",
-    content: "In this post, I will discuss how to use the Python Pandas library to extract data from Excel files. Pandas is a powerful tool for data manipulation and analysis. I will provide examples of how to read Excel files, filter data, and perform basic data analysis tasks.",
-    image: "/screenshot1.png"
+    content: "At first I import panda library and read the excel file using pandas.read_excel() function. Hope can manipulate the data using pandas DataFrame methods. But it;s fail and only show result NaN (Not a Number).",
   }
 ];
