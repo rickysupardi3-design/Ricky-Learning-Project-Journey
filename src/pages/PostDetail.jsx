@@ -14,6 +14,13 @@ export default function PostDetail() {
       <Link to="/">← Back to Home</Link>
       <h1 style={{ marginTop: "1rem" }}>{post.title}</h1>
       <p style={{ color: "gray" }}><small>{post.date}</small></p>
+      {post.image && (
+        <img 
+          src={post.image} 
+          alt={post.title} 
+          style={{ width: "100%", maxHeight: "400px", objectFit: "cover", borderRadius: "8px", margin: "1rem 0" }}
+        />
+      )}
       <p style={{ lineHeight: "1.6", fontSize: "1.1rem" }}>{post.content}</p>
     </div>
   );
