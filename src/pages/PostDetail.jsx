@@ -1,30 +1,33 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { mockPosts } from "../data/posts";
 import { FormattedText } from "../utils/formatParser";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "../styles/PostBox.css";
 import FormattedTextarea from "../components/FormattedTextarea";
 
 export default function PostDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [post, setPost] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState("");
   const [editContent, setEditContent] = useState("");
   const [editImages, setEditImages] = useState({});
-  
-  // Try to find post from localStorage first, then from mockPosts
-  const getSavedPosts = () => {
-    const saved = localStorage.getItem("blogPosts");
-    return saved ? JSON.parse(saved) : mockPosts;
-  };
-  
-  const allPosts = getSavedPosts();
-  const post = allPosts.find((p) => p.id === parseInt(id) || p.id === parseInt(id) || p.id === id);
+  const [loading, setLoading] = useState(true);
 
-  if (!post) {
-    return <div style={{ padding: "2rem" }}><h2>Post not found!</h2><Link to="/">Back Home</Link></div>;
-  }
+  // Fetch post from API
+  useEffect(() => {
+    fetch(`http://localhost:5000/api/posts/${id}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setPost(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching post:", error);
+        setLoading(false);
+      });
+  }, [id]);
 
   // Initialize edit form when edit button is clicked
   const handleEditClick = () => {
@@ -67,38 +70,44 @@ export default function PostDetail() {
     });
   };
 
-  // Save edited post
-  const handleSaveEdit = () => {
-    if (!editTitle.trim()) {
-      alert("Please enter a title");
-      return;
-    }
-    if (!editContent.trim()) {
-      alert("Please enter content");
-      return;
-    }
+   // Save edited post
+   const handleSaveEdit = () => {
+     if (!editTitle.trim()) {
+       alert("Please enter a title");
+       return;
+     }
+     if (!editContent.trim()) {
+       alert("Please enter content");
+       return;
+     }
 
-    // Update post in localStorage
-    const saved = localStorage.getItem("blogPosts");
-    let posts = saved ? JSON.parse(saved) : mockPosts;
-    
-    posts = posts.map(p => 
-      p.id === post.id 
-        ? {
-            ...p,
-            title: editTitle.trim(),
-            content: editContent.trim(),
-            images: editImages,
-            excerpt: editContent.substring(0, 150) + "..."
-          }
-        : p
-    );
+     const updatedPost = {
+       ...post,
+       title: editTitle.trim(),
+       content: editContent.trim(),
+       images: editImages,
+       excerpt: editContent.substring(0, 150) + "..."
+     };
 
-    localStorage.setItem("blogPosts", JSON.stringify(posts));
-    setIsEditing(false);
-    // Refresh page to show updated content
-    window.location.reload();
-  };
+     // Send update to API
+     fetch(`http://localhost:5000/api/posts/${post.id}`, {
+       method: 'PUT',
+       headers: {
+         'Content-Type': 'application/json',
+       },
+       body: JSON.stringify(updatedPost),
+     })
+       .then((response) => response.json())
+       .then((data) => {
+         alert("Post updated successfully!");
+         setPost(data);
+         setIsEditing(false);
+       })
+       .catch((error) => {
+         console.error("Error updating post:", error);
+         alert("Failed to update post");
+       });
+   };
 
   // Handle text formatting - apply to selected text
   const applyFormat = (format) => {
@@ -153,60 +162,71 @@ export default function PostDetail() {
      setIsEditing(false);
    };
 
-  // Delete post
-  const handleDeletePost = () => {
-    if (window.confirm("Are you sure you want to delete this post? This action cannot be undone.")) {
-      const saved = localStorage.getItem("blogPosts");
-      let posts = saved ? JSON.parse(saved) : mockPosts;
-      
-      posts = posts.filter(p => p.id !== post.id);
-      localStorage.setItem("blogPosts", JSON.stringify(posts));
-      
-      alert("Post deleted successfully!");
-      navigate("/");
-    }
-  };
+   // Delete post
+   const handleDeletePost = () => {
+     if (window.confirm("Are you sure you want to delete this post? This action cannot be undone.")) {
+       fetch(`http://localhost:5000/api/posts/${post.id}`, {
+         method: 'DELETE',
+         headers: {
+           'Content-Type': 'application/json',
+         },
+       })
+         .then((response) => response.json())
+         .then((data) => {
+           alert("Post deleted successfully!");
+           navigate("/");
+         })
+         .catch((error) => {
+           console.error("Error deleting post:", error);
+           alert("Failed to delete post");
+         });
+     }
+   };
 
-  return ( 
-    <div style={{ padding: "2rem", maxWidth: "800px", margin: "0 auto" }}>
-      {!isEditing ? (
-        <>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-            <Link to="/">← Back to Home</Link>
-            <div style={{ display: "flex", gap: "1rem" }}>
-              <button 
-                onClick={handleEditClick}
-                style={{
-                  padding: "0.5rem 1rem",
-                  backgroundColor: "#007bff",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "4px",
-                  cursor: "pointer",
-                  fontSize: "0.9rem"
-                }}
-              >
-                Edit
-              </button>
-              <button 
-                onClick={handleDeletePost}
-                style={{
-                  padding: "0.5rem 1rem",
-                  backgroundColor: "#dc3545",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "4px",
-                  cursor: "pointer",
-                  fontSize: "0.9rem"
-                }}
-              >
-                Delete
-              </button>
-            </div>
-          </div>
+   return ( 
+     <div style={{ padding: "2rem", maxWidth: "800px", margin: "0 auto" }}>
+       {loading ? (
+         <div style={{ textAlign: "center" }}>Loading post...</div>
+       ) : !post ? (
+         <div><h2>Post not found!</h2><Link to="/">Back Home</Link></div>
+       ) : !isEditing ? (
+         <>
+           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+             <Link to="/">← Back to Home</Link>
+             <div style={{ display: "flex", gap: "1rem" }}>
+               <button 
+                 onClick={handleEditClick}
+                 style={{
+                   padding: "0.5rem 1rem",
+                   backgroundColor: "#007bff",
+                   color: "white",
+                   border: "none",
+                   borderRadius: "4px",
+                   cursor: "pointer",
+                   fontSize: "0.9rem"
+                 }}
+               >
+                 Edit
+               </button>
+               <button 
+                 onClick={handleDeletePost}
+                 style={{
+                   padding: "0.5rem 1rem",
+                   backgroundColor: "#dc3545",
+                   color: "white",
+                   border: "none",
+                   borderRadius: "4px",
+                   cursor: "pointer",
+                   fontSize: "0.9rem"
+                 }}
+               >
+                 Delete
+               </button>
+             </div>
+           </div>
 
-          <h1 style={{ marginTop: "1rem" }}>{post.title}</h1>
-          <p style={{ color: "gray" }}><small>{post.date}</small></p>
+           <h1 style={{ marginTop: "1rem" }}>{post.title}</h1>
+           <p style={{ color: "gray" }}><small>{post.date}</small></p>
           
           {/* Display multiple images if available */}
           {post.images && post.images.length > 0 && (

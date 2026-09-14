@@ -101,7 +101,7 @@ export default function PostBox({ onPostCreate }) {
     }
 
     if (!summary.trim()) {
-      alert("Please enter 'What is your goal for this?'");
+      alert("Please enter 'What is your goal today?'");
       return;
     }
 
@@ -129,14 +129,30 @@ export default function PostBox({ onPostCreate }) {
       excerpt: summary.trim(),
     };
 
-    onPostCreate(newPost);
+    // Send to backend API
+    fetch('http://localhost:5000/api/posts', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newPost),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        alert("Post created successfully!");
+        onPostCreate(newPost);
 
-    // Reset form
-    setTitle("");
-    setSummary("");
-    setContent("");
-    setImages({});
-    setIsExpanded(false);
+        // Reset form
+        setTitle("");
+        setSummary("");
+        setContent("");
+        setImages({});
+        setIsExpanded(false);
+      })
+      .catch((error) => {
+        console.error("Error creating post:", error);
+        alert("Failed to create post. Make sure the server is running on localhost:5000");
+      });
   };
 
   // Handle cancel
