@@ -1,0 +1,79 @@
+.formatted-textarea-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.formatted-textarea-toolbar {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+}
+
+.format-btn {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  background-color: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.format-btn:hover {
+  background-color: #e9ecef;
+}
+
+.format-btn.active {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.formatted-textarea-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.formatted-textarea-input {
+  width: 100%;
+  min-height: 300px;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: inherit;
+  margin-bottom: 1rem;
+  box-sizing: border-box;
+  resize: vertical;
+  background-color: white;
+  color: black;
+  caret-color: black;
+  line-height: 1.5;
+}
+
+.formatted-textarea-display {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: inherit;
+  background-color: transparent;
+  box-sizing: border-box;
+  pointer-events: none;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  line-height: 1.5;
+  color: transparent;
+  z-index: 1;
+  display: none;
+}
